@@ -19,11 +19,6 @@ stages:
   - job: PlanJob
     displayName: 'Terraform Init & Plan'
     steps:
-    - task: TerraformInstaller@1
-      displayName: 'Install Terraform'
-      inputs:
-        terraformVersion: 'latest'
-
     - task: AzureCLI@2
       displayName: 'Terraform Init & Validate'
       inputs:
@@ -32,6 +27,16 @@ stages:
         scriptLocation: 'inlineScript'
         workingDirectory: '$(workingDirectory)'
         inlineScript: |
+          echo "===> Checking Terraform Installation..."
+          if ! command -v terraform &> /dev/null; then
+            echo "Installing Terraform..."
+            sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+            curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+            sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+            sudo apt-get update && sudo apt-get install terraform -y
+          fi
+          terraform -version
+
           echo "===> Initializing Terraform Backend..."
           terraform init
 
@@ -62,11 +67,6 @@ stages:
         deploy:
           steps:
           - checkout: self
-          
-          - task: TerraformInstaller@1
-            displayName: 'Install Terraform'
-            inputs:
-              terraformVersion: 'latest'
 
           - task: AzureCLI@2
             displayName: 'Terraform Apply'
@@ -76,6 +76,16 @@ stages:
               scriptLocation: 'inlineScript'
               workingDirectory: '$(workingDirectory)'
               inlineScript: |
+                echo "===> Checking Terraform Installation..."
+                if ! command -v terraform &> /dev/null; then
+                  echo "Installing Terraform..."
+                  sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+                  curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+                  sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+                  sudo apt-get update && sudo apt-get install terraform -y
+                fi
+                terraform -version
+
                 echo "===> Initializing Terraform Backend..."
                 terraform init
 
