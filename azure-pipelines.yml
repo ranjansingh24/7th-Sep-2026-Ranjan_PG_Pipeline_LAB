@@ -59,7 +59,7 @@ stages:
           $env:ARM_SUBSCRIPTION_ID = "ea6c786f-3f34-4f15-a6f8-88057a9b27b9"
 
           Write-Host "===> Running Terraform Plan..."
-          terraform plan -out=tfplan
+          terraform plan -input=false -out=tfplan
 
 - stage: Terraform_Apply
   displayName: 'Terraform Apply'
@@ -94,9 +94,9 @@ stages:
                 terraform -version
 
                 Write-Host "===> Initializing Terraform Backend..."
-                terraform init
+                terraform init -input=false
 
                 Write-Host "===> Applying Terraform Infrastructure..."
-                terraform apply -auto-approve
+                terraform apply -input=false -auto-approve
 
 
