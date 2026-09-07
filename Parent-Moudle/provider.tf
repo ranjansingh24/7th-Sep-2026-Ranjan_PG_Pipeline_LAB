@@ -9,7 +9,7 @@ terraform {
 terraform {
   backend "azurerm" {
     resource_group_name  = "Ranjan_24"
-    storage_account_name = "ranjansingh24"
+    storage_account_name = "ranjanst2026"
     container_name       = "ranjancontainer"
     key                  = "ranjan.tfstate"
 
@@ -17,7 +17,7 @@ terraform {
 }
 provider "azurerm" {
   features {}
-  subscription_id = "cf4adfd0-252d-4813-b002-f6f2095a23a8"
+  subscription_id = "ea6c786f-3f34-4f15-a6f8-88057a9b27b9"
 }
 
 

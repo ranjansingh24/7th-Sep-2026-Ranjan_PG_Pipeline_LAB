@@ -1,0 +1,83 @@
+# Azure DevOps YAML Pipeline for Terraform Infrastructure Deployment
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # Name of your Azure DevOps Service Connection connected to Azure Subscription ea6c786f-3f34-4f15-a6f8-88057a9b27b9
+  azureServiceConnection: 'Azure-Service-Connection'
+  workingDirectory: '$(System.DefaultWorkingDirectory)/Parent-Moudle'
+
+stages:
+- stage: Terraform_Validate_And_Plan
+  displayName: 'Terraform Validate & Plan'
+  jobs:
+  - job: PlanJob
+    displayName: 'Terraform Init & Plan'
+    steps:
+    - task: TerraformInstaller@1
+      displayName: 'Install Terraform'
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: AzureCLI@2
+      displayName: 'Terraform Init & Validate'
+      inputs:
+        azureSubscription: '$(azureServiceConnection)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        workingDirectory: '$(workingDirectory)'
+        inlineScript: |
+          echo "===> Initializing Terraform Backend..."
+          terraform init
+
+          echo "===> Validating Terraform Configurations..."
+          terraform validate
+
+    - task: AzureCLI@2
+      displayName: 'Terraform Plan'
+      inputs:
+        azureSubscription: '$(azureServiceConnection)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        workingDirectory: '$(workingDirectory)'
+        inlineScript: |
+          echo "===> Running Terraform Plan..."
+          terraform plan -out=tfplan
+
+- stage: Terraform_Apply
+  displayName: 'Terraform Apply'
+  dependsOn: Terraform_Validate_And_Plan
+  condition: succeeded()
+  jobs:
+  - deployment: ApplyJob
+    displayName: 'Terraform Apply Infrastructure'
+    environment: 'Production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          
+          - task: TerraformInstaller@1
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: AzureCLI@2
+            displayName: 'Terraform Apply'
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              workingDirectory: '$(workingDirectory)'
+              inlineScript: |
+                echo "===> Initializing Terraform Backend..."
+                terraform init
+
+                echo "===> Applying Terraform Infrastructure..."
+                terraform apply -auto-approve
