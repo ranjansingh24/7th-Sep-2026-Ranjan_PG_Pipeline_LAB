@@ -93,6 +93,6 @@ stages:
           terraform init -input=false
 
           Write-Host "===> Applying Terraform Infrastructure..."
-          terraform apply -input=false -auto-approve
+          terraform apply -input=false -lock=false -auto-approve
 
 
