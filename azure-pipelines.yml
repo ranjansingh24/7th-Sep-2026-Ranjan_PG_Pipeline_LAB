@@ -25,8 +25,15 @@ stages:
         azureSubscription: '$(azureServiceConnection)'
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
+        addSpnToEnvironment: true
         workingDirectory: '$(workingDirectory)'
         inlineScript: |
+          echo "===> Exporting Azure Credentials for Terraform..."
+          export ARM_CLIENT_ID=$servicePrincipalId
+          export ARM_CLIENT_SECRET=$servicePrincipalKey
+          export ARM_TENANT_ID=$tenantId
+          export ARM_SUBSCRIPTION_ID="ea6c786f-3f34-4f15-a6f8-88057a9b27b9"
+
           echo "===> Checking Terraform Installation..."
           if ! command -v terraform &> /dev/null; then
             echo "Installing Terraform..."
@@ -49,8 +56,15 @@ stages:
         azureSubscription: '$(azureServiceConnection)'
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
+        addSpnToEnvironment: true
         workingDirectory: '$(workingDirectory)'
         inlineScript: |
+          echo "===> Exporting Azure Credentials for Terraform..."
+          export ARM_CLIENT_ID=$servicePrincipalId
+          export ARM_CLIENT_SECRET=$servicePrincipalKey
+          export ARM_TENANT_ID=$tenantId
+          export ARM_SUBSCRIPTION_ID="ea6c786f-3f34-4f15-a6f8-88057a9b27b9"
+
           echo "===> Running Terraform Plan..."
           terraform plan -out=tfplan
 
@@ -74,8 +88,15 @@ stages:
               azureSubscription: '$(azureServiceConnection)'
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
+              addSpnToEnvironment: true
               workingDirectory: '$(workingDirectory)'
               inlineScript: |
+                echo "===> Exporting Azure Credentials for Terraform..."
+                export ARM_CLIENT_ID=$servicePrincipalId
+                export ARM_CLIENT_SECRET=$servicePrincipalKey
+                export ARM_TENANT_ID=$tenantId
+                export ARM_SUBSCRIPTION_ID="ea6c786f-3f34-4f15-a6f8-88057a9b27b9"
+
                 echo "===> Checking Terraform Installation..."
                 if ! command -v terraform &> /dev/null; then
                   echo "Installing Terraform..."
@@ -91,3 +112,4 @@ stages:
 
                 echo "===> Applying Terraform Infrastructure..."
                 terraform apply -auto-approve
+
