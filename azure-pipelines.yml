@@ -66,37 +66,33 @@ stages:
   dependsOn: Terraform_Validate_And_Plan
   condition: succeeded()
   jobs:
-  - deployment: ApplyJob
+  - job: ApplyJob
     displayName: 'Terraform Apply Infrastructure'
-    environment: 'Production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - checkout: self
+    steps:
+    - checkout: self
 
-          - task: AzureCLI@2
-            displayName: 'Terraform Apply'
-            inputs:
-              azureSubscription: '$(azureServiceConnection)'
-              scriptType: 'ps'
-              scriptLocation: 'inlineScript'
-              addSpnToEnvironment: true
-              workingDirectory: '$(workingDirectory)'
-              inlineScript: |
-                Write-Host "===> Exporting Azure Credentials for Terraform..."
-                $env:ARM_CLIENT_ID = $env:servicePrincipalId
-                $env:ARM_CLIENT_SECRET = $env:servicePrincipalKey
-                $env:ARM_TENANT_ID = $env:tenantId
-                $env:ARM_SUBSCRIPTION_ID = "ea6c786f-3f34-4f15-a6f8-88057a9b27b9"
+    - task: AzureCLI@2
+      displayName: 'Terraform Apply'
+      inputs:
+        azureSubscription: '$(azureServiceConnection)'
+        scriptType: 'ps'
+        scriptLocation: 'inlineScript'
+        addSpnToEnvironment: true
+        workingDirectory: '$(workingDirectory)'
+        inlineScript: |
+          Write-Host "===> Exporting Azure Credentials for Terraform..."
+          $env:ARM_CLIENT_ID = $env:servicePrincipalId
+          $env:ARM_CLIENT_SECRET = $env:servicePrincipalKey
+          $env:ARM_TENANT_ID = $env:tenantId
+          $env:ARM_SUBSCRIPTION_ID = "ea6c786f-3f34-4f15-a6f8-88057a9b27b9"
 
-                Write-Host "===> Checking Terraform Installation..."
-                terraform -version
+          Write-Host "===> Checking Terraform Installation..."
+          terraform -version
 
-                Write-Host "===> Initializing Terraform Backend..."
-                terraform init -input=false
+          Write-Host "===> Initializing Terraform Backend..."
+          terraform init -input=false
 
-                Write-Host "===> Applying Terraform Infrastructure..."
-                terraform apply -input=false -auto-approve
+          Write-Host "===> Applying Terraform Infrastructure..."
+          terraform apply -input=false -auto-approve
 
 
